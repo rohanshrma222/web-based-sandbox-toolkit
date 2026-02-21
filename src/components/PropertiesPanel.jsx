@@ -13,22 +13,9 @@ export function PropertiesPanel() {
     return (
       <aside className="properties">
         <div className="properties-header">
-          <h3 className="properties-title">/// Properties</h3>
+          <h3 className="properties-title">Properties</h3>
         </div>
         <div className="properties-content">
-          <div className="empty-state">
-            <svg className="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="6" />
-              <circle cx="12" cy="12" r="2" />
-              <line x1="12" y1="2" x2="12" y2="4" />
-              <line x1="12" y1="20" x2="12" y2="22" />
-              <line x1="2" y1="12" x2="4" y2="12" />
-              <line x1="20" y1="12" x2="22" y2="12" />
-            </svg>
-            <p className="empty-state-text">No Target Locked</p>
-            <p className="empty-state-hint">Select object to edit</p>
-          </div>
         </div>
       </aside>
     )
@@ -43,24 +30,26 @@ export function PropertiesPanel() {
     updateObject(selectedObject.id, { [property]: value })
   }
   
+  const typeName = selectedObject.type.replace('fish-', '').replace('coral-', '').replace('plant-', '').replace('terrain-', '')
+  
   return (
     <aside className="properties">
       <div className="properties-header">
-        <h3 className="properties-title">/// Properties</h3>
+        <h3 className="properties-title">Properties</h3>
       </div>
       <div className="properties-content">
         <div className="prop-group">
-          <label className="prop-label">Type</label>
+          <label className="prop-label">Object Type</label>
           <input 
             type="text" 
             className="prop-input" 
-            value={selectedObject.type.replace('fish-', '').replace('coral-', '').replace('plant-', '').replace('terrain-', '').toUpperCase()} 
+            value={typeName.charAt(0).toUpperCase() + typeName.slice(1)} 
             disabled 
           />
         </div>
         
         <div className="prop-group">
-          <label className="prop-label">Position X</label>
+          <label className="prop-label">Position (X)</label>
           <input 
             type="number" 
             className="prop-input" 
@@ -71,7 +60,7 @@ export function PropertiesPanel() {
         </div>
         
         <div className="prop-group">
-          <label className="prop-label">Position Y</label>
+          <label className="prop-label">Position (Y)</label>
           <input 
             type="number" 
             className="prop-input" 
@@ -82,7 +71,7 @@ export function PropertiesPanel() {
         </div>
         
         <div className="prop-group">
-          <label className="prop-label">Position Z</label>
+          <label className="prop-label">Position (Z)</label>
           <input 
             type="number" 
             className="prop-input" 
@@ -132,7 +121,7 @@ export function PropertiesPanel() {
             onChange={(e) => handlePropertyChange('behavior', e.target.value)}
           >
             {BEHAVIOR_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label.toUpperCase()}</option>
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
         </div>
@@ -156,7 +145,7 @@ export function PropertiesPanel() {
           style={{ marginTop: '0.5rem' }}
           onClick={() => removeObject(selectedObject.id)}
         >
-          [DELETE]
+          Delete Object
         </button>
       </div>
     </aside>

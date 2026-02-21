@@ -1,7 +1,6 @@
 import { useStore, MARINE_OBJECT_TYPES } from '../store'
 
 export function Footer() {
-  const objects = useStore(state => state.objects)
   const addObject = useStore(state => state.addObject)
   const clearAll = useStore(state => state.clearAll)
   
@@ -13,19 +12,14 @@ export function Footer() {
   
   return (
     <footer className="app-footer">
-      <button className="btn btn-primary" onClick={handleAddRandom}>
-        + Add Object
-      </button>
-      
-      <button className="btn btn-secondary" onClick={clearAll}>
-        Clear
-      </button>
-      
-      <div className="stats">
-        <span>OBJECTS:</span>
-        <span className="stats-value">{objects.length}</span>
-        <span>MAX:</span>
-        <span className="stats-value">50</span>
+      <div className="footer-actions">
+        <button className="btn btn-sm btn-primary" onClick={handleAddRandom}>
+          + Add Random
+        </button>
+        
+        <button className="btn btn-sm btn-secondary" onClick={clearAll}>
+          Clear All
+        </button>
       </div>
     </footer>
   )

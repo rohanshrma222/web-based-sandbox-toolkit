@@ -49,10 +49,11 @@ export default function App() {
           onClick={handleCanvasClick}
         >
           <Scene onDrop={handleDrop} />
-          <div className={`canvas-hint ${objects.length > 0 ? 'hidden' : ''}`}>
-            Drag objects from sidebar to add<br />
-            Click objects to select and edit
-          </div>
+          {objects.length === 0 && (
+            <div className="canvas-hint">
+              Drag assets to add
+            </div>
+          )}
         </section>
         
         <PropertiesPanel />

@@ -22,7 +22,7 @@ function Seabed() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
       <primitive object={geometry} />
-      <meshPhongMaterial color="#1a2f1a" shininess={5} />
+      <meshPhongMaterial color="#c2b280" shininess={5} />
     </mesh>
   )
 }
@@ -77,7 +77,7 @@ function Particles() {
           itemSize={3}
         />
       </bufferGeometry>
-      <pointsMaterial color="#00ff41" size={0.03} transparent opacity={0.6} />
+      <pointsMaterial color="#7dd3fc" size={0.04} transparent opacity={0.5} />
     </points>
   )
 }
@@ -100,8 +100,8 @@ function CausticLights() {
         <pointLight
           key={i}
           ref={el => lightsRef.current[i] = el}
-          color="#00ff41"
-          intensity={0.4}
+          color="#7dd3fc"
+          intensity={0.5}
           position={[0, 6, 0]}
           distance={12}
         />
@@ -168,7 +168,7 @@ function AnimatedObject({ object, isSelected, onClick }) {
           <mesh ref={ringRef}>
             <ringGeometry args={[0.8, 0.85, 32]} />
             <meshBasicMaterial 
-              color="#00ff41" 
+              color="#0284c7" 
               transparent 
               opacity={0.4}
               side={THREE.DoubleSide}
@@ -178,7 +178,7 @@ function AnimatedObject({ object, isSelected, onClick }) {
             <sphereGeometry args={[0.7, 16, 16]} />
             <meshBasicMaterial 
               wireframe 
-              color="#00ff41" 
+              color="#0284c7" 
               transparent 
               opacity={0.15}
             />
@@ -197,14 +197,14 @@ function SceneContent() {
   
   return (
     <>
-      <color attach="background" args={['#050808']} />
-      <fogExp2 attach="fog" args={['#0a0f0a', 0.05]} />
+      <color attach="background" args={['#0c4a6e']} />
+      <fogExp2 attach="fog" args={['#164e63', 0.025]} />
       
-      <ambientLight intensity={0.3} color="#1a3a1a" />
+      <ambientLight intensity={0.7} color="#e0f2fe" />
       <directionalLight
-        position={[5, 10, 5]}
-        intensity={0.4}
-        color="#00ff41"
+        position={[5, 12, 5]}
+        intensity={1}
+        color="#ffffff"
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-far={50}
@@ -213,7 +213,7 @@ function SceneContent() {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      <directionalLight position={[-5, 3, -5]} intensity={0.1} color="#003300" />
+      <directionalLight position={[-5, 5, -5]} intensity={0.3} color="#bae6fd" />
       
       <CausticLights />
       
@@ -225,12 +225,12 @@ function SceneContent() {
           position={[0, -1.99, 0]}
           args={[16, 16]}
           cellSize={1}
-          cellThickness={0.3}
-          cellColor="#1f2f1f"
+          cellThickness={0.5}
+          cellColor="#1e3a5f"
           sectionSize={4}
-          sectionThickness={0.5}
-          sectionColor="#2f4f2f"
-          fadeDistance={15}
+          sectionThickness={1}
+          sectionColor="#2d4a6f"
+          fadeDistance={20}
           fadeStrength={1}
           infiniteGrid
         />
