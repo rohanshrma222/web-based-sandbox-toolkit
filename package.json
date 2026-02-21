@@ -1,0 +1,25 @@
+{
+  "name": "marine-ar-sandbox",
+  "version": "1.0.0",
+  "description": "Marine AR Sandbox Toolkit - A web-based sandbox for creating and testing marine AR modules",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "three": "^0.183.1",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "tailwindcss": "^4.2.0",
+    "vite": "^7.3.1"
+  }
+}

@@ -1,0 +1,635 @@
+@import "tailwindcss";
+
+/* ========================================
+   SONAR CONTROL PANEL - Deep Sea Research
+   Unique aesthetic: Submarine sonar station
+   ======================================== */
+
+@theme {
+  /* Colors - CRT Terminal */
+  --color-screen-black: #0a0f0a;
+  --color-screen-dark: #0d140d;
+  --color-screen-mid: #152015;
+  --color-screen-light: #1f2f1f;
+  
+  /* Phosphor colors */
+  --color-phosphor-green: #00ff41;
+  --color-phosphor-green-dim: #00aa2a;
+  --color-phosphor-amber: #ffb000;
+  --color-phosphor-amber-dim: #aa7700;
+  --color-phosphor-red: #ff3333;
+  --color-phosphor-cyan: #00ffff;
+  
+  --color-bg-base: #050808;
+  --color-bg-elevated: #0a0f0a;
+  --color-bg-surface: #0d140d;
+  --color-bg-subtle: #152015;
+  
+  --color-text-primary: #00ff41;
+  --color-text-secondary: #00aa2a;
+  --color-text-muted: #006622;
+  
+  --color-border-default: #1f2f1f;
+  --color-border-subtle: #152015;
+  --color-border-emphasis: #2f4f2f;
+  
+  /* Primary - Sonar Green */
+  --color-primary: #00ff41;
+  --color-primary-hover: #33ff66;
+  --color-primary-active: #00cc33;
+  --color-primary-subtle: rgba(0, 255, 65, 0.1);
+  
+  /* Secondary - Warning Amber */
+  --color-secondary: #ffb000;
+  --color-secondary-hover: #ffc233;
+  
+  /* Accent - Deep Cyan */
+  --color-accent: #00ffff;
+  
+  /* Semantic */
+  --color-success: #00ff41;
+  --color-warning: #ffb000;
+  --color-danger: #ff3333;
+  
+  /* Typography */
+  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+  --font-display: 'Orbitron', 'Arial Black', sans-serif;
+  
+  /* Spacing */
+  --spacing-xs: 0.125rem;
+  --spacing-sm: 0.25rem;
+  --spacing-md: 0.5rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+}
+
+/* Base */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
+  background: var(--color-bg-base);
+  -webkit-font-smoothing: none;
+  letter-spacing: 0.05em;
+}
+
+/* Scanline overlay */
+.app::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 2px; }
+}
+
+/* App Layout */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: 
+    radial at 50%-gradient(ellipse 100%, rgba(0, 50, 0, 0.3) 0%, transparent 50%),
+    var(--color-bg-base);
+  border: 2px solid var(--color-border-default);
+}
+
+/* CRT screen glow */
+.app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  box-shadow: inset 0 0 100px rgba(0, 255, 65, 0.03);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Header - Console Top */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--color-bg-elevated);
+  border-bottom: 2px solid var(--color-border-default);
+  position: relative;
+}
+
+/* Decorative screws */
+.app-header::before,
+.app-header::after {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  font-size: 0.5rem;
+}
+
+.app-header::before { left: 0.5rem; }
+.app-header::after { right: 0.5rem; }
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 10px var(--color-primary);
+}
+
+/* Status indicators */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.65rem;
+}
+
+.status-led {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-led::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary);
+  animation: blink 2s ease-in-out infinite;
+}
+
+.status-led.warning::before {
+  background: var(--color-warning);
+  box-shadow: 0 0 6px var(--color-warning);
+}
+
+.status-led.danger::before {
+  background: var(--color-danger);
+  box-shadow: 0 0 6px var(--color-danger);
+  animation: blink 0.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Main */
+.app-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar - Object Palette */
+.sidebar {
+  width: 140px;
+  background: var(--color-bg-elevated);
+  border-right: 2px solid var(--color-border-default);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Corner brackets */
+.sidebar::before {
+  content: '┌─────────┐';
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  font-size: 0.5rem;
+  color: var(--color-text-muted);
+}
+
+.sidebar::after {
+  content: '└─────────┘';
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  font-size: 0.5rem;
+  color: var(--color-text-muted);
+}
+
+.sidebar-section {
+  padding: 1.25rem 0.5rem 0.5rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.sidebar-section:last-child {
+  border-bottom: none;
+}
+
+.sidebar-title {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+  padding-left: 0.25rem;
+  border-left: 2px solid var(--color-secondary);
+}
+
+/* Asset Grid */
+.asset-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.asset-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  cursor: grab;
+  transition: all 100ms ease;
+  user-select: none;
+}
+
+.asset-item:hover {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.asset-item:active {
+  cursor: grabbing;
+  background: var(--color-primary-subtle);
+}
+
+.asset-icon {
+  width: 12px;
+  height: 12px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.asset-name {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Canvas - Radar Display */
+.canvas-area {
+  flex: 1;
+  position: relative;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(0, 50, 0, 0.1) 0%, transparent 50%),
+    var(--color-screen-black);
+  overflow: hidden;
+}
+
+/* Radar rings */
+.canvas-area::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border: 1px solid rgba(0, 255, 65, 0.1);
+  border-radius: 50%;
+}
+
+.canvas-area::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border: 1px solid rgba(0, 255, 65, 0.05);
+  border-radius: 50%;
+}
+
+.canvas-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.canvas-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-text-muted);
+  text-align: center;
+  pointer-events: none;
+  font-size: 0.7rem;
+  z-index: 5;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Properties Panel - Control Panel */
+.properties {
+  width: 180px;
+  background: var(--color-bg-elevated);
+  border-left: 2px solid var(--color-border-default);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Panel header */
+.properties-header {
+  padding: 0.75rem;
+  border-bottom: 2px solid var(--color-border-default);
+  background: var(--color-bg-surface);
+}
+
+.properties-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.properties-content {
+  padding: 0.75rem;
+}
+
+/* Property Groups */
+.prop-group {
+  margin-bottom: 0.75rem;
+}
+
+.prop-label {
+  display: block;
+  font-size: 0.55rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.prop-input {
+  width: 100%;
+  height: 28px;
+  padding: 0 0.5rem;
+  background: var(--color-screen-dark);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 2px;
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  transition: all 100ms ease;
+}
+
+.prop-input:hover {
+  border-color: var(--color-primary-dim);
+}
+
+.prop-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-primary-subtle);
+}
+
+.prop-input:disabled {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+/* Color Input */
+.prop-color {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.prop-color-input {
+  width: 28px;
+  height: 28px;
+  padding: 1px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 2px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.prop-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.prop-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 1px;
+}
+
+/* Select */
+.prop-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%2300ff41' d='M4 6L1 2h6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  padding-right: 20px;
+  cursor: pointer;
+}
+
+/* Range slider */
+.prop-input[type="range"] {
+  -webkit-appearance: none;
+  background: var(--color-screen-dark);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 2px;
+  padding: 0;
+}
+
+.prop-input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 14px;
+  background: var(--color-primary);
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+/* Footer - Control Bar */
+.app-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-bg-elevated);
+  border-top: 2px solid var(--color-border-default);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  border-radius: 2px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 100ms ease;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  gap: 0.35rem;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  height: 24px;
+  padding: 0 0.5rem;
+  font-size: 0.55rem;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-screen-black);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: 0 0 10px var(--color-primary-subtle);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary-dim);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(255, 51, 51, 0.1);
+}
+
+/* Stats - Digital Display */
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  font-size: 0.6rem;
+  color: var(--color-text-muted);
+}
+
+.stats-value {
+  color: var(--color-primary);
+  font-weight: 600;
+  min-width: 1.5rem;
+  display: inline-block;
+  text-align: right;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0.5rem;
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.75rem;
+  opacity: 0.3;
+  color: var(--color-primary);
+}
+
+.empty-state-text {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.empty-state-hint {
+  font-size: 0.5rem;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+  margin-top: 0.25rem;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-screen-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-emphasis);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dim);
+}
+
+/* Selection box in 3D - Radar ping style */
+@keyframes radarPing {
+  0% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% { 
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
