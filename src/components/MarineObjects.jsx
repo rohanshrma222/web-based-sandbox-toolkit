@@ -1,5 +1,6 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useGLTF, useAnimations } from '@react-three/drei'
 import * as THREE from 'three'
 import { MARINE_OBJECT_TYPES } from '../store'
 
@@ -47,37 +48,46 @@ function Clownfish({ color = '#ff6b35', ...props }) {
 }
 
 function Jellyfish({ color = '#ff69b4', ...props }) {
-  const tentaclesRef = useRef()
-  
+  const groupRef = useRef()
+  const { scene, animations } = useGLTF('/jellyfish.glb')
+  const { actions, names } = useAnimations(animations, groupRef)
+
+  const clonedScene = useMemo(() => {
+    const cloned = scene.clone()
+    cloned.traverse((child) => {
+      if (child.isMesh) {
+        child.material = child.material.clone()
+        child.material.color = new THREE.Color(color)
+        child.material.emissive = new THREE.Color(color)
+        child.material.emissiveIntensity = 0.3
+      }
+    })
+    return cloned
+  }, [scene, color])
+
+  useEffect(() => {
+    if (actions && names.length > 0) {
+      const action = actions[names[0]]
+      if (action) {
+        action.reset().fadeIn(0.5).play()
+      }
+    }
+  }, [actions, names])
+
   useFrame((state) => {
-    if (tentaclesRef.current) {
-      tentaclesRef.current.children.forEach((tentacle, i) => {
-        tentacle.rotation.x = Math.sin(state.clock.elapsedTime * 2 + i) * 0.2
-      })
+    if (groupRef.current) {
+      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 1.5) * 0.1
     }
   })
-  
+
   return (
     <group {...props}>
-      <mesh castShadow position={[0, 0.1, 0]}>
-        <sphereGeometry args={[0.35, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshPhongMaterial color={color} transparent opacity={0.7} shininess={100} />
-      </mesh>
-      <group ref={tentaclesRef}>
-        {[...Array(6)].map((_, i) => {
-          const angle = (i / 6) * Math.PI * 2
-          return (
-            <group key={i} position={[Math.cos(angle) * 0.2, -0.2, Math.sin(angle) * 0.2]}>
-              {[...Array(4)].map((_, j) => (
-                <mesh key={j} position={[0, -0.15 - j * 0.2, 0]}>
-                  <cylinderGeometry args={[0.015, 0.03, 0.2, 6]} />
-                  <meshPhongMaterial color={color} transparent opacity={0.5} />
-                </mesh>
-              ))}
-            </group>
-          )
-        })}
-      </group>
+      <primitive
+        object={clonedScene}
+        ref={groupRef}
+        scale={0.5}
+        position={[0, -0.5, 0]}
+      />
     </group>
   )
 }
@@ -133,7 +143,7 @@ function BrainCoral({ color = '#ed8936', ...props }) {
     geo.computeVertexNormals()
     return geo
   }, [])
-  
+
   return (
     <group {...props}>
       <mesh castShadow geometry={geometry}>
@@ -149,7 +159,7 @@ function BrainCoral({ color = '#ed8936', ...props }) {
 
 function Seaweed({ color = '#48bb68', ...props }) {
   const bladesRef = useRef([])
-  
+
   useFrame((state) => {
     bladesRef.current.forEach((blade, i) => {
       if (blade) {
@@ -158,12 +168,12 @@ function Seaweed({ color = '#48bb68', ...props }) {
       }
     })
   })
-  
+
   return (
     <group {...props}>
       {[...Array(6)].map((_, i) => (
-        <group 
-          key={i} 
+        <group
+          key={i}
           position={[(Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2]}
           ref={el => bladesRef.current[i] = el}
         >
@@ -254,7 +264,7 @@ function Shell({ color = '#fbd38d', ...props }) {
 
 export function MarineObject({ type, color, ...props }) {
   const objectProps = { color, ...props }
-  
+
   switch (type) {
     case MARINE_OBJECT_TYPES.FISH_CLOWNFISH:
       return <Clownfish {...objectProps} />

@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Grid } from '@react-three/drei'
 import * as THREE from 'three'
@@ -18,7 +18,7 @@ function Seabed() {
     geo.computeVertexNormals()
     return geo
   }, [])
-  
+
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
       <primitive object={geometry} />
@@ -30,11 +30,11 @@ function Seabed() {
 function Particles() {
   const count = 100
   const mesh = useRef()
-  
+
   const particles = useMemo(() => {
     const positions = new Float32Array(count * 3)
     const data = []
-    
+
     for (let i = 0; i < count; i++) {
       positions[i * 3] = (Math.random() - 0.5) * 20
       positions[i * 3 + 1] = Math.random() * 10 - 2
@@ -44,29 +44,29 @@ function Particles() {
         wobble: Math.random() * Math.PI * 2,
       })
     }
-    
+
     return { positions, data }
   }, [])
-  
+
   useFrame((state, delta) => {
     if (!mesh.current) return
-    
+
     const positions = mesh.current.geometry.attributes.position.array
-    
+
     for (let i = 0; i < count; i++) {
       const d = particles.data[i]
       positions[i * 3 + 1] += d.speed * delta
-      
+
       if (positions[i * 3 + 1] > 8) {
         positions[i * 3 + 1] = -2
         positions[i * 3] = (Math.random() - 0.5) * 20
         positions[i * 3 + 2] = (Math.random() - 0.5) * 20
       }
     }
-    
+
     mesh.current.geometry.attributes.position.needsUpdate = true
   })
-  
+
   return (
     <points ref={mesh}>
       <bufferGeometry>
@@ -84,7 +84,7 @@ function Particles() {
 
 function CausticLights() {
   const lightsRef = useRef([])
-  
+
   useFrame((state) => {
     lightsRef.current.forEach((light, i) => {
       if (light) {
@@ -93,7 +93,7 @@ function CausticLights() {
       }
     })
   })
-  
+
   return (
     <>
       {[0, 1, 2].map((i) => (
@@ -115,13 +115,13 @@ function AnimatedObject({ object, isSelected, onClick }) {
   const ringRef = useRef()
   const initialPos = useRef({ x: object.position.x, y: object.position.y, z: object.position.z })
   const animTime = useRef(Math.random() * Math.PI * 2)
-  
+
   useFrame((state, delta) => {
     if (!meshRef.current) return
-    
+
     const speed = object.speed || 1
     animTime.current += delta
-    
+
     switch (object.behavior) {
       case BEHAVIORS.SWIM_HORIZONTAL:
         meshRef.current.position.x = initialPos.current.x + Math.sin(animTime.current * speed * 2) * 2
@@ -142,14 +142,14 @@ function AnimatedObject({ object, isSelected, onClick }) {
       default:
         break
     }
-    
+
     if (ringRef.current) {
       ringRef.current.rotation.z += delta * 0.5
     }
   })
-  
+
   const scale = object.scale || 1
-  
+
   return (
     <group
       ref={meshRef}
@@ -162,24 +162,24 @@ function AnimatedObject({ object, isSelected, onClick }) {
       }}
     >
       <MarineObject type={object.type} color={object.color} />
-      
+
       {isSelected && (
         <>
           <mesh ref={ringRef}>
             <ringGeometry args={[0.8, 0.85, 32]} />
-            <meshBasicMaterial 
-              color="#0284c7" 
-              transparent 
+            <meshBasicMaterial
+              color="#0284c7"
+              transparent
               opacity={0.4}
               side={THREE.DoubleSide}
             />
           </mesh>
           <mesh>
             <sphereGeometry args={[0.7, 16, 16]} />
-            <meshBasicMaterial 
-              wireframe 
-              color="#0284c7" 
-              transparent 
+            <meshBasicMaterial
+              wireframe
+              color="#0284c7"
+              transparent
               opacity={0.15}
             />
           </mesh>
@@ -194,12 +194,12 @@ function SceneContent() {
   const selectedId = useStore(state => state.selectedId)
   const selectObject = useStore(state => state.selectObject)
   const showGrid = useStore(state => state.showGrid)
-  
+
   return (
     <>
       <color attach="background" args={['#0c4a6e']} />
       <fogExp2 attach="fog" args={['#164e63', 0.025]} />
-      
+
       <ambientLight intensity={0.7} color="#e0f2fe" />
       <directionalLight
         position={[5, 12, 5]}
@@ -214,12 +214,12 @@ function SceneContent() {
         shadow-camera-bottom={-10}
       />
       <directionalLight position={[-5, 5, -5]} intensity={0.3} color="#bae6fd" />
-      
+
       <CausticLights />
-      
+
       <Seabed />
       <Particles />
-      
+
       {showGrid && (
         <Grid
           position={[0, -1.99, 0]}
@@ -235,7 +235,7 @@ function SceneContent() {
           infiniteGrid
         />
       )}
-      
+
       {objects.map(obj => (
         <AnimatedObject
           key={obj.id}
@@ -244,7 +244,7 @@ function SceneContent() {
           onClick={selectObject}
         />
       ))}
-      
+
       <OrbitControls
         enablePan={true}
         enableZoom={true}
@@ -258,24 +258,25 @@ function SceneContent() {
   )
 }
 
+
 export function Scene({ onDrop }) {
   const canvasRef = useRef()
-  
+
   const handleDrop = (e) => {
     e.preventDefault()
     const rect = e.currentTarget.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 2 - 1
     const y = -((e.clientY - rect.top) / rect.height) * 2 + 1
-    
+
     onDrop({ x: x * 4, y: Math.max(0.5, 1.5 + y), z: 0 })
   }
-  
+
   const handleDragOver = (e) => {
     e.preventDefault()
   }
-  
+
   return (
-    <div 
+    <div
       className="canvas-container"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -286,7 +287,9 @@ export function Scene({ onDrop }) {
         shadows
         gl={{ antialias: true }}
       >
-        <SceneContent />
+        <Suspense fallback={null}>
+          <SceneContent />
+        </Suspense>
       </Canvas>
     </div>
   )
