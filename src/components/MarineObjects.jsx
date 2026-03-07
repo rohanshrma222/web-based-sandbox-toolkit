@@ -55,22 +55,27 @@ function Jellyfish({ color = '#ff69b4', ...props }) {
   const clonedScene = useMemo(() => {
     const cloned = scene.clone()
     cloned.traverse((child) => {
-      if (child.isMesh) {
+      if (child.isMesh && child.material) {
         child.material = child.material.clone()
-        child.material.color = new THREE.Color(color)
-        child.material.emissive = new THREE.Color(color)
-        child.material.emissiveIntensity = 0.3
+        if (color) {
+          child.material.color = new THREE.Color(color)
+          child.material.emissive = new THREE.Color(color)
+          child.material.emissiveIntensity = 0.2
+        }
       }
     })
     return cloned
   }, [scene, color])
 
   useEffect(() => {
-    if (actions && names.length > 0) {
-      const action = actions[names[0]]
-      if (action) {
-        action.reset().fadeIn(0.5).play()
-      }
+    console.log('Jellyfish animations:', names, actions)
+    if (names.length > 0) {
+      names.forEach((name) => {
+        const action = actions[name]
+        if (action) {
+          action.reset().fadeIn(0.5).play()
+        }
+      })
     }
   }, [actions, names])
 
