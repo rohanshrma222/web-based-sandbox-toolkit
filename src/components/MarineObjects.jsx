@@ -44,13 +44,12 @@ function Jellyfish({ color = "#ff69b4", ...props }) {
 }
 
 // Shared helper for GLB models.
-// Uses useGLTF + SkeletonUtils.clone for per-instance scene graphs.
-// Supports animations if the GLB contains them.
+// bodyColor     → applied only to the single largest mesh by bounding box volume
 // fallbackColor → applied to untextured non-body meshes (teeth, eyes, etc.)
-// tintColor     → tints only warm-hued textured meshes (e.g. goldfish body)
-// bodyColor     → applied only to the single largest mesh by bounding box
-//                 volume (anglerfish body), leaving smaller details alone
-function GLBModel({ path, fallbackColor, tintColor, bodyColor, ...props }) {
+// tintColor     → tints only warm-hued textured meshes
+// paintAllColor → applied to EVERY mesh whose base material has saturation > 0.1
+//                 (all colored parts), skipping neutral grey/white meshes
+function GLBModel({ path, fallbackColor, tintColor, bodyColor, paintAllColor, ...props }) {
   const groupRef = useRef();
   const { scene, animations } = useGLTF(path);
 
@@ -66,11 +65,24 @@ function GLBModel({ path, fallbackColor, tintColor, bodyColor, ...props }) {
     });
   }, [actions, names]);
 
+  // Auto-scale ONCE when the model first loads.
+  // Must be separate from the color effect — setFromObject returns world-space
+  // bounds, so if scale + color ran together, every color change would re-read
+  // the already-scaled bounds (~1 unit) and reset scale back to 1.0, making
+  // the object jump to 5× its intended size and disappear off-camera.
   useEffect(() => {
     if (!cloned || !groupRef.current) return;
-
-    // Update world matrices FIRST so bounding box volumes are correct
     cloned.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(cloned);
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    if (maxDim > 0) groupRef.current.scale.setScalar(1.0 / maxDim);
+  }, [cloned]); // cloned only — never re-runs when color changes
+
+  // Apply colors whenever bodyColor / tintColor / fallbackColor change.
+  // Scale is intentionally NOT recalculated here.
+  useEffect(() => {
+    if (!cloned) return;
 
     // Collect all meshes
     const meshes = [];
@@ -87,6 +99,24 @@ function GLBModel({ path, fallbackColor, tintColor, bodyColor, ...props }) {
       mat.opacity = 1;
       mat.needsUpdate = true;
     };
+
+    // paintAllColor: apply to every mesh whose material has saturation > 0.1.
+    // This covers all colored body parts uniformly while leaving neutral
+    // white/grey meshes (eyes, teeth) at their original colors.
+    if (paintAllColor) {
+      meshes.forEach((child) => {
+        const mat = child.material;
+        if (!mat || !mat.color) return;
+        const hsl = {};
+        mat.color.getHSL(hsl);
+        if (hsl.s > 0.1) {
+          child.material = mat.clone();
+          child.material.color = new THREE.Color(paintAllColor);
+          makeSolid(child.material);
+        }
+      });
+      return; // skip bodyColor / tintColor paths when paintAllColor is set
+    }
 
     // If bodyColor is requested, find the largest mesh by bounding box volume
     let bodyMesh = null;
@@ -129,13 +159,7 @@ function GLBModel({ path, fallbackColor, tintColor, bodyColor, ...props }) {
         }
       }
     });
-
-    // Auto-scale to ~1 unit bounding box
-    const box = new THREE.Box3().setFromObject(cloned);
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    if (maxDim > 0) groupRef.current.scale.setScalar(1.0 / maxDim);
-  }, [cloned, fallbackColor, tintColor, bodyColor]);
+  }, [cloned, fallbackColor, tintColor, bodyColor, paintAllColor]);
 
   return (
     <group {...props} ref={groupRef}>
@@ -158,8 +182,9 @@ function Anglerfish({ color, ...props }) {
 }
 
 function Goldfish({ color, ...props }) {
-  // Pass the user-chosen color as tintColor so the orange body is recolorable
-  return <GLBModel path="/gold.glb" tintColor={color || "#ff6a00"} {...props} />;
+  // paintAllColor paints every colored mesh (saturation > 0.1) uniformly —
+  // bodyColor only hit the largest single mesh, leaving other parts unchanged.
+  return <GLBModel path="/gold.glb" paintAllColor={color || "#ff6a00"} {...props} />;
 }
 
 export function MarineObject({ type, color, ...props }) {
