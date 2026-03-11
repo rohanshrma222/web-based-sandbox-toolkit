@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense } from 'react'
+import { useRef, useMemo, Suspense, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Grid } from '@react-three/drei'
 import * as THREE from 'three'
@@ -11,28 +11,28 @@ function Particles() {
 
   const particles = useMemo(() => {
     const positions = new Float32Array(count * 3)
-    const sizes     = new Float32Array(count)      // per-particle size
-    const origins   = new Float32Array(count * 2)  // original X/Z to wobble around
+    const sizes = new Float32Array(count)      // per-particle size
+    const origins = new Float32Array(count * 2)  // original X/Z to wobble around
     const data = []
 
     for (let i = 0; i < count; i++) {
       const x = (Math.random() - 0.5) * 24
       const z = (Math.random() - 0.5) * 24
-      positions[i * 3]     = x
+      positions[i * 3] = x
       positions[i * 3 + 1] = Math.random() * 12 - 2  // spread full water column
       positions[i * 3 + 2] = z
 
-      origins[i * 2]     = x   // anchor X
+      origins[i * 2] = x   // anchor X
       origins[i * 2 + 1] = z   // anchor Z
 
       // Vary size: small tight bubbles (0.04) to larger ones (0.18)
       sizes[i] = 0.04 + Math.random() * 0.14
 
       data.push({
-        speed:  0.08 + Math.random() * 0.18,      // rise speed
+        speed: 0.08 + Math.random() * 0.18,      // rise speed
         wobble: Math.random() * Math.PI * 2,       // initial phase offset
-        drift:  0.15 + Math.random() * 0.25,       // horizontal drift amplitude
-        freq:   0.4  + Math.random() * 0.6,        // horizontal drift frequency
+        drift: 0.15 + Math.random() * 0.25,       // horizontal drift amplitude
+        freq: 0.4 + Math.random() * 0.6,        // horizontal drift frequency
       })
     }
 
@@ -43,7 +43,7 @@ function Particles() {
     if (!mesh.current) return
 
     const pos = mesh.current.geometry.attributes.position.array
-    const t   = state.clock.elapsedTime
+    const t = state.clock.elapsedTime
 
     for (let i = 0; i < count; i++) {
       const d = particles.data[i]
@@ -52,7 +52,7 @@ function Particles() {
       pos[i * 3 + 1] += d.speed * delta
 
       // Horizontal sine drift around origin — uses wobble for unique phase
-      pos[i * 3]     = particles.origins[i * 2]     + Math.sin(t * d.freq + d.wobble) * d.drift
+      pos[i * 3] = particles.origins[i * 2] + Math.sin(t * d.freq + d.wobble) * d.drift
       pos[i * 3 + 2] = particles.origins[i * 2 + 1] + Math.cos(t * d.freq * 0.7 + d.wobble) * d.drift * 0.5
 
       // Reset when bubble reaches surface — re-seed a new random origin
@@ -60,9 +60,9 @@ function Particles() {
         const nx = (Math.random() - 0.5) * 24
         const nz = (Math.random() - 0.5) * 24
         pos[i * 3 + 1] = -2
-        particles.origins[i * 2]     = nx
+        particles.origins[i * 2] = nx
         particles.origins[i * 2 + 1] = nz
-        pos[i * 3]     = nx
+        pos[i * 3] = nx
         pos[i * 3 + 2] = nz
       }
     }
@@ -133,6 +133,11 @@ function AnimatedObject({ object, isSelected, onClick }) {
   const initialPos = useRef({ x: object.position.x, y: object.position.y, z: object.position.z })
   const animTime = useRef(Math.random() * Math.PI * 2)
 
+  // Sync initialPos when the user edits position in the Properties Panel
+  useEffect(() => {
+    initialPos.current = { x: object.position.x, y: object.position.y, z: object.position.z }
+  }, [object.position.x, object.position.y, object.position.z])
+
   useFrame((state, delta) => {
     if (!meshRef.current) return
 
@@ -140,10 +145,7 @@ function AnimatedObject({ object, isSelected, onClick }) {
     animTime.current += delta
 
     switch (object.behavior) {
-      case BEHAVIORS.SWIM_HORIZONTAL:
-        meshRef.current.position.x = initialPos.current.x + Math.sin(animTime.current * speed * 2) * 2
-        meshRef.current.rotation.y = Math.sin(animTime.current * speed) * 0.3
-        break
+
       case BEHAVIORS.SWIM_VERTICAL:
         meshRef.current.position.y = initialPos.current.y + Math.sin(animTime.current * speed * 1.5) * 0.5
         meshRef.current.rotation.z = Math.sin(animTime.current * speed * 0.5) * 0.1

@@ -19,7 +19,6 @@ export const OBJECT_CATEGORIES = {
 
 export const BEHAVIORS = {
   STATIC: "static",
-  SWIM_HORIZONTAL: "swim-horizontal",
   SWIM_VERTICAL: "swim-vertical",
   FLOAT: "float",
   SWAY: "sway",
@@ -27,7 +26,6 @@ export const BEHAVIORS = {
 
 export const BEHAVIOR_OPTIONS = [
   { value: BEHAVIORS.STATIC, label: "Static" },
-  { value: BEHAVIORS.SWIM_HORIZONTAL, label: "Swim Horizontal" },
   { value: BEHAVIORS.SWIM_VERTICAL, label: "Swim Vertical" },
   { value: BEHAVIORS.FLOAT, label: "Float" },
   { value: BEHAVIORS.SWAY, label: "Sway" },

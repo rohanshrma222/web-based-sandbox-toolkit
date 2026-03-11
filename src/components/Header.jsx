@@ -1,5 +1,17 @@
 import { useStore } from '../store'
 
+function downloadJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 export function Header() {
   const showGrid   = useStore(state => state.showGrid)
   const toggleGrid = useStore(state => state.toggleGrid)
@@ -23,9 +35,34 @@ export function Header() {
 
       <div className="header-actions">
         {objects.length > 0 && (
-          <div className="header-badge">
-            🐠 {objects.length} object{objects.length !== 1 ? 's' : ''}
-          </div>
+          <>
+            <div className="header-badge">
+              🐠 {objects.length} object{objects.length !== 1 ? 's' : ''}
+            </div>
+            <button
+              className="btn btn-sm btn-ghost"
+              onClick={() => {
+                const exportData = objects.map(obj => ({
+                  type: obj.type,
+                  position: obj.position,
+                  rotation: obj.rotation,
+                  scale: obj.scale,
+                  color: obj.color,
+                  behavior: obj.behavior,
+                  speed: obj.speed
+                }))
+                downloadJSON({ scene_objects: exportData }, 'marine-sandbox-scene.json')
+              }}
+              title="Export scene as JSON"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export JSON
+            </button>
+          </>
         )}
         <button
           className="btn btn-sm btn-ghost"
