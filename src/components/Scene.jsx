@@ -6,22 +6,9 @@ import { useStore, BEHAVIORS } from '../store'
 import { MarineObject } from './MarineObjects'
 
 function Seabed() {
-  const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(30, 30, 32, 32)
-    const positions = geo.attributes.position
-    for (let i = 0; i < positions.count; i++) {
-      const x = positions.getX(i)
-      const y = positions.getY(i)
-      const noise = Math.sin(x * 0.5) * Math.cos(y * 0.5) * 0.1
-      positions.setZ(i, noise)
-    }
-    geo.computeVertexNormals()
-    return geo
-  }, [])
-
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
-      <primitive object={geometry} />
+      <planeGeometry args={[30, 30]} />
       <meshPhongMaterial color="#c2b280" shininess={5} />
     </mesh>
   )
