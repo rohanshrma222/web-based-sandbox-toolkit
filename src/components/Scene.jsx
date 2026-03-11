@@ -162,29 +162,6 @@ function AnimatedObject({ object, isSelected, onClick }) {
       }}
     >
       <MarineObject type={object.type} color={object.color} />
-
-      {isSelected && (
-        <>
-          <mesh ref={ringRef}>
-            <ringGeometry args={[0.8, 0.85, 32]} />
-            <meshBasicMaterial
-              color="#0284c7"
-              transparent
-              opacity={0.4}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-          <mesh>
-            <sphereGeometry args={[0.7, 16, 16]} />
-            <meshBasicMaterial
-              wireframe
-              color="#0284c7"
-              transparent
-              opacity={0.15}
-            />
-          </mesh>
-        </>
-      )}
     </group>
   )
 }
