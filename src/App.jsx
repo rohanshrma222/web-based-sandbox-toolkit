@@ -51,7 +51,8 @@ export default function App() {
           <Scene onDrop={handleDrop} />
           {objects.length === 0 && (
             <div className="canvas-hint">
-              Drag assets to add
+              <span className="canvas-hint-dot" aria-hidden="true" />
+              Drag creatures from the sidebar to begin
             </div>
           )}
         </section>

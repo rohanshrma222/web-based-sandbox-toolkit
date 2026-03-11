@@ -4,20 +4,20 @@ const ASSET_CONFIG = {
   [MARINE_OBJECT_TYPES.FISH_JELLYFISH]: {
     name: "Jellyfish",
     icon: "🎐",
-    color: "#ff69b4",
-    gradient: "linear-gradient(135deg, #ff69b4, #da70d6)",
+    gradient: "linear-gradient(135deg, #6d28d9 0%, #c026d3 60%, #f43f5e 100%)",
+    description: "Bioluminescent drifter",
   },
   [MARINE_OBJECT_TYPES.FISH_ANGLERFISH]: {
     name: "Anglerfish",
-    icon: "🦷",
-    color: "#1a2f4c",
-    gradient: "linear-gradient(135deg, #1a2f4c, #4a6fa5)",
+    icon: "🎣",
+    gradient: "linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 60%, #0ea5e9 100%)",
+    description: "Deep-sea predator",
   },
   [MARINE_OBJECT_TYPES.FISH_GOLDFISH]: {
     name: "Goldfish",
-    icon: "🐟",
-    color: "#ffa500",
-    gradient: "linear-gradient(135deg, #ffa500, #ff6b35)",
+    icon: "🐠",
+    gradient: "linear-gradient(135deg, #b45309 0%, #f97316 60%, #fbbf24 100%)",
+    description: "Curious reef fish",
   },
 };
 
@@ -28,7 +28,14 @@ function AssetItem({ type, config }) {
   };
 
   return (
-    <div className="asset-item" draggable onDragStart={handleDragStart}>
+    <div
+      className="asset-item"
+      draggable
+      onDragStart={handleDragStart}
+      title={`Drag to add ${config.name} — ${config.description}`}
+      role="button"
+      aria-label={`Add ${config.name}`}
+    >
       <div className="asset-icon" style={{ background: config.gradient }}>
         {config.icon}
       </div>
@@ -38,26 +45,40 @@ function AssetItem({ type, config }) {
 }
 
 export function Sidebar() {
-  const objectCount = useStore((state) => state.objects.length);
-
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" aria-label="Asset Library">
       <div className="sidebar-header">
         <h2 className="sidebar-title">Asset Library</h2>
       </div>
 
-      {Object.entries(OBJECT_CATEGORIES).map(([key, category]) => (
-        <div key={key} className="sidebar-section">
-          <h3 className="section-title">{category.label}</h3>
-          <div className="asset-grid">
-            {category.types
-              .filter((type) => ASSET_CONFIG[type])
-              .map((type) => (
+      {Object.entries(OBJECT_CATEGORIES).map(([key, category]) => {
+        const available = category.types.filter((t) => ASSET_CONFIG[t]);
+        return (
+          <div key={key} className="sidebar-section">
+            <h3 className="section-title">{category.label}</h3>
+            <div className="asset-grid">
+              {available.map((type) => (
                 <AssetItem key={type} type={type} config={ASSET_CONFIG[type]} />
               ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
+
+      <div style={{
+        marginTop: 'auto',
+        padding: '0.75rem',
+        borderTop: '1px solid var(--border)',
+      }}>
+        <p style={{
+          fontSize: '0.65rem',
+          color: 'var(--text-dim)',
+          lineHeight: '1.5',
+          textAlign: 'center',
+        }}>
+          Drag creatures onto the canvas to place them in the scene
+        </p>
+      </div>
     </aside>
   );
 }
