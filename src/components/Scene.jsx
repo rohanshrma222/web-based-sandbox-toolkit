@@ -5,49 +5,65 @@ import * as THREE from 'three'
 import { useStore, BEHAVIORS } from '../store'
 import { MarineObject } from './MarineObjects'
 
-function Seabed() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
-      <planeGeometry args={[30, 30]} />
-      <meshPhongMaterial color="#c2b280" shininess={5} />
-    </mesh>
-  )
-}
-
 function Particles() {
-  const count = 100
+  const count = 250
   const mesh = useRef()
 
   const particles = useMemo(() => {
     const positions = new Float32Array(count * 3)
+    const sizes     = new Float32Array(count)      // per-particle size
+    const origins   = new Float32Array(count * 2)  // original X/Z to wobble around
     const data = []
 
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20
-      positions[i * 3 + 1] = Math.random() * 10 - 2
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20
+      const x = (Math.random() - 0.5) * 24
+      const z = (Math.random() - 0.5) * 24
+      positions[i * 3]     = x
+      positions[i * 3 + 1] = Math.random() * 12 - 2  // spread full water column
+      positions[i * 3 + 2] = z
+
+      origins[i * 2]     = x   // anchor X
+      origins[i * 2 + 1] = z   // anchor Z
+
+      // Vary size: small tight bubbles (0.04) to larger ones (0.18)
+      sizes[i] = 0.04 + Math.random() * 0.14
+
       data.push({
-        speed: 0.1 + Math.random() * 0.15,
-        wobble: Math.random() * Math.PI * 2,
+        speed:  0.08 + Math.random() * 0.18,      // rise speed
+        wobble: Math.random() * Math.PI * 2,       // initial phase offset
+        drift:  0.15 + Math.random() * 0.25,       // horizontal drift amplitude
+        freq:   0.4  + Math.random() * 0.6,        // horizontal drift frequency
       })
     }
 
-    return { positions, data }
+    return { positions, sizes, origins, data }
   }, [])
 
   useFrame((state, delta) => {
     if (!mesh.current) return
 
-    const positions = mesh.current.geometry.attributes.position.array
+    const pos = mesh.current.geometry.attributes.position.array
+    const t   = state.clock.elapsedTime
 
     for (let i = 0; i < count; i++) {
       const d = particles.data[i]
-      positions[i * 3 + 1] += d.speed * delta
 
-      if (positions[i * 3 + 1] > 8) {
-        positions[i * 3 + 1] = -2
-        positions[i * 3] = (Math.random() - 0.5) * 20
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 20
+      // Rise
+      pos[i * 3 + 1] += d.speed * delta
+
+      // Horizontal sine drift around origin — uses wobble for unique phase
+      pos[i * 3]     = particles.origins[i * 2]     + Math.sin(t * d.freq + d.wobble) * d.drift
+      pos[i * 3 + 2] = particles.origins[i * 2 + 1] + Math.cos(t * d.freq * 0.7 + d.wobble) * d.drift * 0.5
+
+      // Reset when bubble reaches surface — re-seed a new random origin
+      if (pos[i * 3 + 1] > 9) {
+        const nx = (Math.random() - 0.5) * 24
+        const nz = (Math.random() - 0.5) * 24
+        pos[i * 3 + 1] = -2
+        particles.origins[i * 2]     = nx
+        particles.origins[i * 2 + 1] = nz
+        pos[i * 3]     = nx
+        pos[i * 3 + 2] = nz
       }
     }
 
@@ -63,8 +79,22 @@ function Particles() {
           array={particles.positions}
           itemSize={3}
         />
+        <bufferAttribute
+          attach="attributes-size"
+          count={count}
+          array={particles.sizes}
+          itemSize={1}
+        />
       </bufferGeometry>
-      <pointsMaterial color="#7dd3fc" size={0.04} transparent opacity={0.5} />
+      <pointsMaterial
+        color="#a5d8ff"
+        size={0.08}
+        sizeAttenuation
+        transparent
+        opacity={0.55}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
     </points>
   )
 }
@@ -181,7 +211,6 @@ function SceneContent() {
 
       <CausticLights />
 
-      <Seabed />
       <Particles />
 
       {showGrid && (

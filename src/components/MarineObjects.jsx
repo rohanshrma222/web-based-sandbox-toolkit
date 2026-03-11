@@ -201,3 +201,13 @@ export function MarineObject({ type, color, ...props }) {
       return <Jellyfish {...objectProps} />;
   }
 }
+
+// Preload all models when this module is imported.
+// Without this, the first drag of each species triggers useGLTF to suspend,
+// which unmounts the entire SceneContent via the <Suspense> boundary —
+// causing existing objects (e.g. anglerfish) to disappear while the new
+// model loads. Preloading makes useGLTF synchronous from the start.
+useGLTF.preload('/jellyfishR.glb')
+useGLTF.preload('/angler.glb')
+useGLTF.preload('/gold.glb')
+
