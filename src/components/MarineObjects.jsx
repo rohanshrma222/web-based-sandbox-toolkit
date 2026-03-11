@@ -1,51 +1,9 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useGLTF, useAnimations } from "@react-three/drei";
+import { useGLTF, useAnimations, useFBX } from "@react-three/drei";
 import * as THREE from "three";
 import { MARINE_OBJECT_TYPES } from "../store";
 
-function Clownfish({ color = "#ff6b35", ...props }) {
-  return (
-    <group {...props}>
-      <mesh castShadow>
-        <sphereGeometry args={[0.4, 16, 12]} />
-        <meshPhongMaterial color={color} shininess={30} />
-      </mesh>
-      <mesh castShadow position={[-0.15, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <torusGeometry args={[0.35, 0.06, 8, 16]} />
-        <meshPhongMaterial color="#ffffff" />
-      </mesh>
-      <mesh castShadow position={[0.1, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <torusGeometry args={[0.32, 0.05, 8, 16]} />
-        <meshPhongMaterial color="#ffffff" />
-      </mesh>
-      <mesh castShadow position={[-0.6, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.25, 0.5, 3]} />
-        <meshPhongMaterial color={color} />
-      </mesh>
-      <mesh castShadow position={[0, 0.35, 0]}>
-        <coneGeometry args={[0.15, 0.35, 3]} />
-        <meshPhongMaterial color={color} />
-      </mesh>
-      <mesh position={[0.35, 0.12, 0.2]}>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshPhongMaterial color="#000000" />
-      </mesh>
-      <mesh position={[0.38, 0.12, 0.2]}>
-        <sphereGeometry args={[0.04, 6, 6]} />
-        <meshPhongMaterial color="#ffffff" />
-      </mesh>
-      <mesh position={[0.35, 0.12, -0.2]}>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshPhongMaterial color="#000000" />
-      </mesh>
-      <mesh position={[0.38, 0.12, -0.2]}>
-        <sphereGeometry args={[0.04, 6, 6]} />
-        <meshPhongMaterial color="#ffffff" />
-      </mesh>
-    </group>
-  );
-}
 
 function Jellyfish({ color = "#ff69b4", ...props }) {
   const groupRef = useRef();
@@ -84,15 +42,58 @@ function Jellyfish({ color = "#ff69b4", ...props }) {
   );
 }
 
+// Shared helper for FBX models.
+// Renders the raw FBX directly and auto-scales to fit ~1 unit bounding box.
+function FBXModel({ path, color, materialColor, ...props }) {
+  const groupRef = useRef();
+  const fbx = useFBX(path);
+
+  useEffect(() => {
+    if (!fbx) return;
+
+    // Ensure all meshes are visible (some FBX exporters set hidden by default)
+    fbx.traverse((child) => {
+      if (child.isMesh || child.isSkinnedMesh) {
+        child.visible = true;
+      }
+    });
+
+    // Auto-scale: fit the loaded model to ~1 unit so it sits inside the selection ring
+    fbx.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(fbx);
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    if (maxDim > 0 && groupRef.current) {
+      groupRef.current.scale.setScalar(1.0 / maxDim);
+    }
+  }, [fbx]);
+
+  return (
+    <group {...props} ref={groupRef}>
+      <primitive object={fbx} />
+    </group>
+  );
+}
+
+function Anglerfish({ color, ...props }) {
+  return <FBXModel path="/angler.fbx" color={color} materialColor="#1a2f4c" {...props} />;
+}
+
+function Goldfish({ color, ...props }) {
+  return <FBXModel path="/fish2.fbx" color={color} materialColor="#ffa500" {...props} />;
+}
+
 export function MarineObject({ type, color, ...props }) {
   const objectProps = { color, ...props };
 
   switch (type) {
-    case MARINE_OBJECT_TYPES.FISH_CLOWNFISH:
-      return <Clownfish {...objectProps} />;
     case MARINE_OBJECT_TYPES.FISH_JELLYFISH:
       return <Jellyfish {...objectProps} />;
+    case MARINE_OBJECT_TYPES.FISH_ANGLERFISH:
+      return <Anglerfish {...objectProps} />;
+    case MARINE_OBJECT_TYPES.FISH_GOLDFISH:
+      return <Goldfish {...objectProps} />;
     default:
-      return <Clownfish {...objectProps} />;
+      return <Jellyfish {...objectProps} />;
   }
 }
