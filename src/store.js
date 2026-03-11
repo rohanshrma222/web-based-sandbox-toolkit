@@ -70,7 +70,7 @@ export const useStore = create((set, get) => ({
       rotation: { x: 0, y: 0, z: 0 },
       scale: 1,
       color: defaultColor,
-      behavior: BEHAVIORS.STATIC,
+      behavior: BEHAVIORS.FLOAT,
       speed: 1,
     };
 
