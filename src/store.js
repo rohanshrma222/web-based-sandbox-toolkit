@@ -4,6 +4,7 @@ export const MARINE_OBJECT_TYPES = {
   FISH_JELLYFISH: "fish-jellyfish",
   FISH_ANGLERFISH: "fish-anglerfish",
   FISH_GOLDFISH: "fish-goldfish",
+  CORAL: "coral",
 };
 
 export const OBJECT_CATEGORIES = {
@@ -14,6 +15,10 @@ export const OBJECT_CATEGORIES = {
       MARINE_OBJECT_TYPES.FISH_ANGLERFISH,
       MARINE_OBJECT_TYPES.FISH_GOLDFISH,
     ],
+  },
+  CORAL: {
+    label: "Coral",
+    types: [MARINE_OBJECT_TYPES.CORAL],
   },
 };
 
@@ -35,6 +40,7 @@ export const DEFAULT_COLORS = {
   [MARINE_OBJECT_TYPES.FISH_JELLYFISH]: "#cb7bd1",
   [MARINE_OBJECT_TYPES.FISH_ANGLERFISH]: "#431976",
   [MARINE_OBJECT_TYPES.FISH_GOLDFISH]: "#da6f0b",
+  [MARINE_OBJECT_TYPES.CORAL]: "#eeff00",
 };
 
 const MAX_OBJECTS = 50;

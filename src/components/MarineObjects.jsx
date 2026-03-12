@@ -182,9 +182,11 @@ function Anglerfish({ color, ...props }) {
 }
 
 function Goldfish({ color, ...props }) {
-  // paintAllColor paints every colored mesh (saturation > 0.1) uniformly —
-  // bodyColor only hit the largest single mesh, leaving other parts unchanged.
   return <GLBModel path="/gold.glb" paintAllColor={color || "#ff6a00"} {...props} />;
+}
+
+function Coral({ color, ...props }) {
+  return <GLBModel path="/coral.glb" paintAllColor={color || "#ff6a00"} {...props} />;
 }
 
 export function MarineObject({ type, color, ...props }) {
@@ -197,6 +199,8 @@ export function MarineObject({ type, color, ...props }) {
       return <Anglerfish {...objectProps} />;
     case MARINE_OBJECT_TYPES.FISH_GOLDFISH:
       return <Goldfish {...objectProps} />;
+    case MARINE_OBJECT_TYPES.CORAL:
+      return <Coral {...objectProps} />;
     default:
       return <Jellyfish {...objectProps} />;
   }
@@ -210,4 +214,5 @@ export function MarineObject({ type, color, ...props }) {
 useGLTF.preload('/jellyfishR.glb')
 useGLTF.preload('/angler.glb')
 useGLTF.preload('/gold.glb')
+useGLTF.preload('/coral.glb')
 

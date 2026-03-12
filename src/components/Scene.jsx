@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Grid } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
-import { useStore, BEHAVIORS } from '../store'
+import { useStore, BEHAVIORS, MARINE_OBJECT_TYPES } from '../store'
 import { MarineObject } from './MarineObjects'
 
 function Particles() {
@@ -273,8 +273,13 @@ export function Scene({ onDrop }) {
     const rect = e.currentTarget.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 2 - 1
     const y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+    
+    const objectType = window.__droppedObjectType
+    const isCoral = objectType === MARINE_OBJECT_TYPES.CORAL
+    const dropY = isCoral ? -1.90 : Math.max(0.5, 1.5 + y)
+    const dropZ = isCoral ? (Math.random() - 0.5) * 6 : 0
 
-    onDrop({ x: x * 4, y: Math.max(0.5, 1.5 + y), z: 0 })
+    onDrop({ x: x * 4, y: dropY, z: dropZ })
   }
 
   const handleDragOver = (e) => {

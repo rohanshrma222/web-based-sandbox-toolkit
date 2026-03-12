@@ -4,20 +4,22 @@ const ASSET_CONFIG = {
   [MARINE_OBJECT_TYPES.FISH_JELLYFISH]: {
     name: "Jellyfish",
     icon: "/jellyfish.png",
-    gradient: "linear-gradient(135deg, #6d28d9 0%, #c026d3 60%, #f43f5e 100%)",
     description: "Bioluminescent drifter",
   },
   [MARINE_OBJECT_TYPES.FISH_ANGLERFISH]: {
     name: "Anglerfish",
     icon: "/anglerfish.png",
-    gradient: "linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 60%, #0ea5e9 100%)",
     description: "Deep-sea predator",
   },
   [MARINE_OBJECT_TYPES.FISH_GOLDFISH]: {
     name: "Goldfish",
     icon: "/goldfish.png",
-    gradient: "linear-gradient(135deg, #b45309 0%, #f97316 60%, #fbbf24 100%)",
     description: "Curious reef fish",
+  },
+  [MARINE_OBJECT_TYPES.CORAL]: {
+    name: "Coral",
+    icon: "/coral.png",
+    description: "Colorful reef coral",
   },
 };
 
