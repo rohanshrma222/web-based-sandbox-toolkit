@@ -26,7 +26,9 @@ export function PropertiesPanel() {
         </div>
         <div className="properties-content">
           <div className="empty-state animate-fade-in">
-            <div className="empty-icon">🐙</div>
+            <div className="empty-icon">
+              <img src="/hook.png" alt="Hook" style={{ width: '40px', height: '40px', opacity: 0.7 }} />
+            </div>
             <p className="empty-title">Nothing selected</p>
             <p className="empty-text">Click an object in the scene or drag one from the sidebar</p>
           </div>

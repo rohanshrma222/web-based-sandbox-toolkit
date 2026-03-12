@@ -10,6 +10,7 @@ export default function App() {
   const objects = useStore(state => state.objects)
   const addObject = useStore(state => state.addObject)
   const deselectObject = useStore(state => state.deselectObject)
+  const studioMode = useStore(state => state.studioMode)
   
   const handleDrop = useCallback((position) => {
     const type = window.__droppedObjectType
@@ -38,7 +39,7 @@ export default function App() {
   }
   
   return (
-    <div className="app">
+    <div className={`app ${studioMode ? 'studio-mode' : ''}`}>
       <Header />
       
       <main className="app-main">

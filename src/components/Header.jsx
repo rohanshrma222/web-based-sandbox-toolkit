@@ -16,6 +16,8 @@ export function Header() {
   const showGrid   = useStore(state => state.showGrid)
   const toggleGrid = useStore(state => state.toggleGrid)
   const objects    = useStore(state => state.objects)
+  const studioMode = useStore(state => state.studioMode)
+  const toggleStudioMode = useStore(state => state.toggleStudioMode)
 
   return (
     <header className="app-header">
@@ -74,6 +76,19 @@ export function Header() {
             <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
           </svg>
           Grid {showGrid ? 'On' : 'Off'}
+        </button>
+        <button
+          className={`btn btn-sm ${studioMode ? 'btn-primary' : 'btn-ghost'}`}
+          onClick={toggleStudioMode}
+          title={studioMode ? 'Exit Studio Mode' : 'Enter Studio Mode (Hide UI)'}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+          Studio
         </button>
       </div>
     </header>

@@ -46,6 +46,9 @@ export const useStore = create((set, get) => ({
   selectedId: null,
   isLoading: false,
   showGrid: true,
+  studioMode: false,
+
+  toggleStudioMode: () => set(state => ({ studioMode: !state.studioMode })),
 
   addObject: (type, position = null) => {
     const { objects } = get();

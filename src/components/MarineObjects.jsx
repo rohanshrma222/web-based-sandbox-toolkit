@@ -20,7 +20,7 @@ function Jellyfish({ color = "#ff69b4", ...props }) {
         if (color) {
           child.material.color = new THREE.Color(color);
           child.material.emissive = new THREE.Color(color);
-          child.material.emissiveIntensity = 0.2;
+          child.material.emissiveIntensity = 0.5;
         }
       }
     });

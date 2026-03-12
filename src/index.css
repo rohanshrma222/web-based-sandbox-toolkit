@@ -116,6 +116,35 @@ body {
 }
 
 /* ============================================================
+   CUSTOM SCROLLBARS (Glowing Dark Ocean Theme)
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(125, 211, 252, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.5);
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.8);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 211, 252, 0.2) transparent;
+}
+
+/* ============================================================
    HEADER
    ============================================================ */
 
@@ -222,11 +251,18 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden;
   flex-shrink: 0;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   position: relative;
   z-index: 20;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.studio-mode .sidebar {
+  width: 0;
+  border-right-width: 0;
 }
 
 .sidebar::after {
@@ -442,6 +478,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden;
   flex-shrink: 0;
   position: relative;
   z-index: 20;
@@ -450,6 +487,12 @@ body {
   will-change: transform;
   isolation: isolate;
   transform: translateZ(0);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.studio-mode .properties {
+  width: 0;
+  border-left-width: 0;
 }
 
 .properties::before {

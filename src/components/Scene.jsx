@@ -1,6 +1,7 @@
 import { useRef, useMemo, Suspense, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Grid } from '@react-three/drei'
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { useStore, BEHAVIORS } from '../store'
 import { MarineObject } from './MarineObjects'
@@ -221,7 +222,7 @@ function SceneContent() {
           args={[16, 16]}
           cellSize={1}
           cellThickness={0.5}
-          cellColor="#1e3a5f"
+          cellColor="#234674ff"
           sectionSize={4}
           sectionThickness={1}
           sectionColor="#2d4a6f"
@@ -249,6 +250,16 @@ function SceneContent() {
         maxPolarAngle={Math.PI / 2 + 0.3}
         target={[0, 0, 0]}
       />
+
+      {/* Cinematic Post-Processing */}
+      <EffectComposer disableNormalPass>
+        <Bloom 
+          luminanceThreshold={0.2} 
+          mipmapBlur 
+          intensity={1.2} 
+        />
+        <Vignette eskil={false} offset={0.01} darkness={1.1} />
+      </EffectComposer>
     </>
   )
 }
