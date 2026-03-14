@@ -43,8 +43,6 @@ export const DEFAULT_COLORS = {
   [MARINE_OBJECT_TYPES.CORAL]: "#eeff00",
 };
 
-const MAX_OBJECTS = 50;
-
 let objectIdCounter = 0;
 
 export const useStore = create((set, get) => ({
@@ -58,11 +56,6 @@ export const useStore = create((set, get) => ({
 
   addObject: (type, position = null) => {
     const { objects } = get();
-    if (objects.length >= MAX_OBJECTS) {
-      console.warn(`Maximum object limit (${MAX_OBJECTS}) reached`);
-      return null;
-    }
-
     const id = ++objectIdCounter;
     const defaultColor = DEFAULT_COLORS[type] || "#888888";
 
@@ -75,10 +68,8 @@ export const useStore = create((set, get) => ({
         z: (Math.random() - 0.5) * 6,
       },
       rotation: { x: 0, y: 0, z: 0 },
-      scale: 1,
       color: defaultColor,
       behavior: BEHAVIORS.FLOAT,
-      speed: 1,
     };
 
     set({ objects: [...objects, newObject] });
@@ -153,7 +144,6 @@ export const useStore = create((set, get) => ({
       objects: objects.map(({ id, ...rest }) => rest),
       metadata: {
         exportedAt: new Date().toISOString(),
-        objectCount: objects.length,
       },
     };
   },

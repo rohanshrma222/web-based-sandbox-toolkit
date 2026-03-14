@@ -38,9 +38,6 @@ export function Header() {
       <div className="header-actions">
         {objects.length > 0 && (
           <>
-            <div className="header-badge">
-              🐠 {objects.length} object{objects.length !== 1 ? 's' : ''}
-            </div>
             <button
               className="btn btn-sm btn-ghost"
               onClick={() => {
@@ -48,10 +45,8 @@ export function Header() {
                   type: obj.type,
                   position: obj.position,
                   rotation: obj.rotation,
-                  scale: obj.scale,
                   color: obj.color,
                   behavior: obj.behavior,
-                  speed: obj.speed
                 }))
                 downloadJSON({ scene_objects: exportData }, 'marine-sandbox-scene.json')
               }}

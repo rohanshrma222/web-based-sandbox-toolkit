@@ -1,4 +1,4 @@
-import { useStore, BEHAVIOR_OPTIONS } from '../store'
+import { useStore } from '../store'
 
 function PropSection({ label, children }) {
   return (
@@ -83,19 +83,6 @@ export function PropertiesPanel() {
             </div>
           </div>
 
-          <div className="prop-group">
-            <label className="prop-label" htmlFor="prop-scale">Scale</label>
-            <input
-              id="prop-scale"
-              type="number"
-              className="prop-input"
-              value={selectedObject.scale}
-              step="0.1"
-              min="0.1"
-              max="5"
-              onChange={e => handlePropertyChange('scale', parseFloat(e.target.value) || 1)}
-            />
-          </div>
         </PropSection>
 
         {/* Appearance */}
@@ -122,40 +109,7 @@ export function PropertiesPanel() {
           </div>
         </PropSection>
 
-        {/* Behavior */}
-        <PropSection label="Behavior">
-          <div className="prop-group">
-            <label className="prop-label" htmlFor="prop-behavior">Animation</label>
-            <select
-              id="prop-behavior"
-              className="prop-input prop-select"
-              value={selectedObject.behavior}
-              onChange={e => handlePropertyChange('behavior', e.target.value)}
-            >
-              {BEHAVIOR_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
 
-          <div className="prop-group">
-            <label className="prop-label" htmlFor="prop-speed">Speed</label>
-            <div className="range-row">
-              <input
-                id="prop-speed"
-                type="range"
-                className="prop-input"
-                value={selectedObject.speed}
-                min="0.1"
-                max="3"
-                step="0.1"
-                onChange={e => handlePropertyChange('speed', parseFloat(e.target.value))}
-                aria-label="Animation speed"
-              />
-              <span className="range-value">{Number(selectedObject.speed).toFixed(1)}</span>
-            </div>
-          </div>
-        </PropSection>
 
         {/* Actions */}
         <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>

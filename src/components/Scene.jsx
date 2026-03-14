@@ -142,22 +142,21 @@ function AnimatedObject({ object, isSelected, onClick }) {
   useFrame((state, delta) => {
     if (!meshRef.current) return
 
-    const speed = object.speed || 1
     animTime.current += delta
 
     switch (object.behavior) {
 
       case BEHAVIORS.SWIM_VERTICAL:
-        meshRef.current.position.y = initialPos.current.y + Math.sin(animTime.current * speed * 1.5) * 0.5
-        meshRef.current.rotation.z = Math.sin(animTime.current * speed * 0.5) * 0.1
+        meshRef.current.position.y = initialPos.current.y + Math.sin(animTime.current * 1.5) * 0.5
+        meshRef.current.rotation.z = Math.sin(animTime.current * 0.5) * 0.1
         break
       case BEHAVIORS.FLOAT:
-        meshRef.current.position.y = initialPos.current.y + Math.sin(animTime.current * speed * 0.8) * 0.3
-        meshRef.current.rotation.y += delta * 0.2 * speed
+        meshRef.current.position.y = initialPos.current.y + Math.sin(animTime.current * 0.8) * 0.3
+        meshRef.current.rotation.y += delta * 0.2
         break
       case BEHAVIORS.SWAY:
-        meshRef.current.rotation.z = Math.sin(animTime.current * speed * 2) * 0.1
-        meshRef.current.rotation.x = Math.cos(animTime.current * speed * 1.5) * 0.05
+        meshRef.current.rotation.z = Math.sin(animTime.current * 2) * 0.1
+        meshRef.current.rotation.x = Math.cos(animTime.current * 1.5) * 0.05
         break
       default:
         break
@@ -168,14 +167,12 @@ function AnimatedObject({ object, isSelected, onClick }) {
     }
   })
 
-  const scale = object.scale || 1
-
   return (
     <group
       ref={meshRef}
       position={[object.position.x, object.position.y, object.position.z]}
       rotation={[object.rotation.x, object.rotation.y, object.rotation.z]}
-      scale={scale}
+      scale={1}
       onClick={(e) => {
         e.stopPropagation()
         onClick(object.id)
