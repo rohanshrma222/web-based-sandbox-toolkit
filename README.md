@@ -2,7 +2,7 @@
 
 A React + Three.js web-based toolkit for composing marine AR environments. Users can place 3D fish into a dark-ocean scene, customize their properties, and export the resulting composition as JSON.
 
-![Sandbox Demo](./demo-screenshot.png)
+![Sandbox Demo](./public/demo-screenshot.png)
 
 ## Features
 
