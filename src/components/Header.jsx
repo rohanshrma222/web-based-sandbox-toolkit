@@ -44,9 +44,8 @@ export function Header() {
                 const exportData = objects.map(obj => ({
                   type: obj.type,
                   position: obj.position,
-                  rotation: obj.rotation,
                   color: obj.color,
-                  behavior: obj.behavior,
+                  behavior: obj.behavior || 'float',
                 }))
                 downloadJSON({ scene_objects: exportData }, 'marine-sandbox-scene.json')
               }}
