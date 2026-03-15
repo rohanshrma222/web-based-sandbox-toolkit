@@ -140,8 +140,19 @@ export const useStore = create((set, get) => ({
 
   exportScene: () => {
     const { objects } = get();
+    const allowedFields = ['type', 'position', 'color', 'behavior'];
     return {
-      objects: objects.map(({ id, ...rest }) => rest),
+      objects: objects.map((obj) => {
+        const filtered = {};
+        allowedFields.forEach(field => {
+          if (field === 'behavior') {
+            filtered[field] = obj[field] || 'float';
+          } else if (obj[field] !== undefined) {
+            filtered[field] = obj[field];
+          }
+        });
+        return filtered;
+      }),
       metadata: {
         exportedAt: new Date().toISOString(),
       },
